@@ -22,20 +22,21 @@
         }
 
         body {
-            background-color: #e0e0e0; /* สีพื้นหลังเมื่อเปิดบนจอใหญ่ */
+            background-color: #e0e0e0;
             color: var(--text-color);
             font-family: var(--font-body);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
         }
 
         #app-container {
             background-color: var(--bg-color);
             width: 100%;
-            max-width: 480px; /* จำลองขนาดหน้าจอสมาร์ทโฟน */
+            max-width: 480px;
             height: 100%;
             position: relative;
             overflow: hidden;
@@ -185,7 +186,7 @@
         /* --- Screen 3: Zen Camera --- */
         #screen-camera {
             padding: 0;
-            background-color: #1a1a1a; /* พื้นหลังสีเข้มเวลาถ่ายรูป */
+            background-color: #1a1a1a;
         }
 
         .camera-nav {
@@ -207,10 +208,11 @@
 
         .shutter-container {
             position: absolute;
-            bottom: 40px;
+            bottom: 10vh; /* แก้ไข: เปลี่ยนจากพิกเซลเป็นสัดส่วนหน้าจอ เพื่อดันปุ่มให้สูงพ้นขอบล่างของมือถือ */
             width: 100%;
             display: flex;
             justify-content: center;
+            z-index: 20; 
         }
 
         .btn-shutter {
@@ -469,126 +471,3 @@
         function setupDailyPrompt() {
             // จัดการวันที่ภาษาไทย
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-            const today = new Date().toLocaleDateString('th-TH', dateOptions);
-            document.getElementById('current-date').innerText = "วันนี้ " + today;
-
-            // สุ่มโจทย์ (ใช้สูตรอิงตามวันที่ เพื่อให้โจทย์เดิมทั้งวัน)
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-            currentPrompt = prompts[dayOfYear % prompts.length];
-            
-            document.getElementById('prompt-title').innerText = currentPrompt.title;
-            document.getElementById('prompt-desc').innerText = currentPrompt.desc;
-        }
-
-        // --- ระบบกล้อง (WebRTC) ---
-        async function startCamera() {
-            navigateTo('screen-camera');
-            const video = document.getElementById('camera-view');
-            try {
-                // บังคับใช้กล้องหลัง (environment)
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" }, 
-                    audio: false 
-                });
-                video.srcObject = cameraStream;
-            } catch (err) {
-                console.error("Camera error:", err);
-                alert("ไม่สามารถเข้าถึงกล้องได้ กรุณาตรวจสอบการอนุญาตการใช้กล้องในเบราว์เซอร์ของคุณ");
-                navigateTo('screen-prompt');
-            }
-        }
-
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-        }
-
-        function stopCameraAndNavigate(screenId) {
-            stopCamera();
-            navigateTo(screenId);
-        }
-
-        function takePicture() {
-            const video = document.getElementById('camera-view');
-            const canvas = document.getElementById('camera-canvas');
-            const context = canvas.getContext('2d');
-
-            // ตั้งค่าขนาด Canvas ให้ตรงกับวิดีโอเพื่อป้องกันภาพเบี้ยว
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // วาดภาพจาก Video ลง Canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // แปลงเป็น Base64 (ปรับคุณภาพเหลือ 0.6 เพื่อประหยัดพื้นที่ Local Storage)
-            currentImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
-
-            // แสดงภาพที่ถ่ายในหน้า Reflection
-            document.getElementById('captured-image').src = currentImageBase64;
-            
-            stopCameraAndNavigate('screen-reflection');
-        }
-
-        // --- ระบบบันทึกและแกลเลอรี (Local Storage) ---
-        function saveReflection() {
-            const reflectionText = document.getElementById('reflection-input').value;
-            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-            
-            const newEntry = {
-                date: dateStr,
-                promptTitle: currentPrompt.title,
-                image: currentImageBase64,
-                text: reflectionText || "..." // ถ้าไม่ได้พิมพ์อะไรให้เป็นจุด
-            };
-
-            // ดึงข้อมูลเก่า และเพิ่มข้อมูลใหม่ไว้บนสุด
-            let entries = JSON.parse(localStorage.getItem('focusFlowEntries')) || [];
-            entries.unshift(newEntry);
-
-            try {
-                localStorage.setItem('focusFlowEntries', JSON.stringify(entries));
-                navigateTo('screen-prompt'); // กลับหน้าหลัก
-            } catch (e) {
-                // จัดการกรณี Local Storage เต็ม (โควต้าประมาณ 5MB)
-                alert("หน่วยความจำเต็ม กรุณาล้างข้อมูลหรือติดต่อผู้พัฒนาเพื่ออัปเกรดระบบฐานข้อมูล");
-            }
-        }
-
-        function openGallery() {
-            const listContainer = document.getElementById('gallery-list');
-            listContainer.innerHTML = ''; // ล้างของเก่าก่อนเรนเดอร์ใหม่
-            
-            const entries = JSON.parse(localStorage.getItem('focusFlowEntries')) || [];
-
-            if (entries.length === 0) {
-                listContainer.innerHTML = '<div class="empty-gallery">ยังไม่มีการบันทึกการเดินทาง<br>เริ่มถ่ายภาพภาวนาภาพแรกของคุณวันนี้</div>';
-            } else {
-                entries.forEach(entry => {
-                    const itemHTML = `
-                        <div class="gallery-item">
-                            <div class="gallery-item-date">${entry.date}</div>
-                            <div class="gallery-item-title">${entry.promptTitle}</div>
-                            <div class="gallery-item-content">
-                                <img class="gallery-item-img" src="${entry.image}" alt="Moment">
-                                <div class="gallery-item-text">${entry.text}</div>
-                            </div>
-                        </div>
-                    `;
-                    listContainer.insertAdjacentHTML('beforeend', itemHTML);
-                });
-            }
-            
-            navigateTo('screen-gallery');
-        }
-
-        // --- เริ่มต้นการทำงานเมื่อโหลดหน้าจอ ---
-        window.onload = () => {
-            setupDailyPrompt();
-            runOnboarding();
-        };
-
-    </script>
-</body>
-</html>

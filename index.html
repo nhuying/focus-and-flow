@@ -152,9 +152,10 @@
 
         .prompt-title {
             font-family: var(--font-heading);
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 16px;
             font-weight: 400;
+            line-height: 1.4;
         }
 
         .prompt-desc {
@@ -162,7 +163,7 @@
             line-height: 1.6;
             color: #666;
             margin-bottom: 48px;
-            max-width: 85%;
+            max-width: 90%;
         }
 
         .btn-camera {
@@ -208,7 +209,7 @@
 
         .shutter-container {
             position: absolute;
-            bottom: 10vh; /* แก้ไข: เปลี่ยนจากพิกเซลเป็นสัดส่วนหน้าจอ เพื่อดันปุ่มให้สูงพ้นขอบล่างของมือถือ */
+            bottom: 10vh; 
             width: 100%;
             display: flex;
             justify-content: center;
@@ -339,135 +340,4 @@
         .gallery-item-text {
             font-size: 0.95rem;
             line-height: 1.5;
-            color: #555;
-            white-space: pre-wrap;
-        }
-        
-        .empty-gallery {
-            text-align: center;
-            color: #999;
-            margin-top: 40px;
-        }
-
-    </style>
-</head>
-<body>
-
-    <div id="app-container">
-        
-        <section id="screen-onboarding" class="screen active">
-            <div class="breathing-circle"></div>
-            <div class="onboarding-text" id="ob-1">ในโลกที่เร่งรีบ<br>เรามักมองทุกอย่างผ่าน “ความคิด”</div>
-            <div class="onboarding-text" id="ob-2">รีบตีความ รีบตัดสิน<br>จนลืมเห็นชีวิตอย่างที่มันเป็น</div>
-            <div class="onboarding-text" id="ob-3">ชวนคุณหยุด วางกรอบเดิมๆ<br>แล้วอนุญาตให้ตัวเองกลับมา 'เห็น' อีกครั้ง</div>
-            <div class="onboarding-text" id="ob-4">ไม่ต้องหาความสวยงาม<br>ไม่ต้องจัดฉาก... แค่สังเกตและรับรู้</div>
-            <button class="btn-start" id="btn-start" onclick="navigateTo('screen-prompt')">เริ่มต้นการเดินทาง</button>
-        </section>
-
-        <section id="screen-prompt" class="screen">
-            <div class="top-nav">
-                <button class="btn-icon" onclick="openGallery()">☰</button>
-            </div>
-            <div class="date-text" id="current-date">วันที่...</div>
-            <h1 class="prompt-title" id="prompt-title">...</h1>
-            <p class="prompt-desc" id="prompt-desc">...</p>
-            <button class="btn-camera" onclick="startCamera()">👁</button>
-        </section>
-
-        <section id="screen-camera" class="screen">
-            <div class="camera-nav">
-                <button class="btn-icon" onclick="stopCameraAndNavigate('screen-prompt')">✕</button>
-            </div>
-            <video id="camera-view" autoplay playsinline></video>
-            <canvas id="camera-canvas" style="display:none;"></canvas>
-            <div class="shutter-container">
-                <button class="btn-shutter" onclick="takePicture()"></button>
-            </div>
-        </section>
-
-        <section id="screen-reflection" class="screen">
-            <div class="reflection-nav">
-                <button class="btn-text" onclick="navigateTo('screen-prompt')">ยกเลิก</button>
-                <button class="btn-text" style="font-weight: bold;" onclick="saveReflection()">บันทึก</button>
-            </div>
-            <img id="captured-image" src="" alt="Captured moment">
-            <div class="reflection-questions">
-                ตอนที่มองสิ่งนี้ผ่านหน้าจอ คุณรู้สึกอย่างไร?<br>
-                ภาพนี้สะท้อนอะไรเกี่ยวกับชีวิตของคุณในตอนนี้บ้าง?
-            </div>
-            <textarea id="reflection-input" class="reflection-input" placeholder="พิมพ์สิ่งที่อยู่ในใจ... ไม่ต้องคัดกรอง"></textarea>
-        </section>
-
-        <section id="screen-gallery" class="screen">
-            <div class="gallery-header">
-                <button class="btn-icon" onclick="navigateTo('screen-prompt')">←</button>
-                <h2>การเดินทางของคุณ</h2>
-            </div>
-            <div id="gallery-list">
-                </div>
-        </section>
-
-    </div>
-
-    <script>
-        // --- ข้อมูลโจทย์ภาวนาประจำวัน ---
-        const prompts = [
-            { title: "ความธรรมดาที่ถูกมองข้าม", desc: "ถ่ายภาพสิ่งของใกล้ตัวที่คุณใช้งานทุกวัน แต่แทบไม่เคยหยุดมองรายละเอียดของมันเลย" },
-            { title: "เต้นรำกับแสงและเงา", desc: "ค้นหาบริเวณที่มีแสงและเงาพาดผ่าน สังเกตการตัดกันของความสว่างและความมืด แล้วบันทึกภาพนั้นไว้" },
-            { title: "พื้นที่ของความเงียบ", desc: "หาก 'ความเงียบ' ในพื้นที่ที่คุณอยู่ตอนนี้มีรูปร่างหน้าตา คุณคิดว่ามันคือมุมไหน?" },
-            { title: "ร่องรอยของกาลเวลา", desc: "ถ่ายภาพสิ่งที่กำลังร่วงโรย เก่าลง หรือเปลี่ยนสภาพไปตามเวลา โดยไม่ต้องตัดสินความงามของมัน" },
-            { title: "สิ่งที่กำลังเคลื่อนไหว", desc: "ถ่ายภาพสิ่งที่กำลังเปลี่ยนรูปทรงหรือตำแหน่ง โดยไม่ต้องกังวลว่าภาพจะเบลอ" },
-            { title: "สิ่งที่รั้งสายตา", desc: "ลองกวาดสายตาไปรอบๆ สิ่งแรกที่ดึงดูดสายตาคุณโดยไม่มีเหตุผลคืออะไร? ถ่ายเก็บไว้โดยไม่ต้องตั้งคำถามว่าทำไม" },
-            { title: "อุปสรรคและทางออก", desc: "ถ่ายภาพสิ่งที่ดูเหมือนการถูกปิดกั้น และภาพของช่องว่างที่แสงหรืออากาศลอดผ่านได้" }
-        ];
-
-        let currentPrompt = {};
-        let currentImageBase64 = "";
-        let cameraStream = null;
-
-        // --- ระบบนำทางหน้าจอ (Navigation) ---
-        function navigateTo(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-            
-            // หากกลับมาหน้าโจทย์ ให้ล้างข้อมูล Reflection เก่า
-            if(screenId === 'screen-prompt') {
-                document.getElementById('reflection-input').value = "";
-            }
-        }
-
-        // --- Onboarding Animation Sequence ---
-        function runOnboarding() {
-            // เช็คว่าเคยเข้าแอปหรือยัง (สำหรับ Demo นี้ตั้งให้เล่นตลอดเพื่อความสวยงาม แต่กดข้ามได้โดยรีบกดปุ่มเริ่ม)
-            const texts = [
-                document.getElementById('ob-1'),
-                document.getElementById('ob-2'),
-                document.getElementById('ob-3'),
-                document.getElementById('ob-4')
-            ];
-            const btn = document.getElementById('btn-start');
-            
-            let delay = 1000;
-            texts.forEach((text, index) => {
-                setTimeout(() => {
-                    // ซ่อนข้อความก่อนหน้า
-                    if (index > 0) texts[index-1].classList.remove('show');
-                    // แสดงข้อความปัจจุบัน
-                    text.classList.add('show');
-                }, delay);
-                delay += 3500; // จังหวะการอ่านแต่ละหน้า
-            });
-
-            // แสดงปุ่มเริ่มพร้อมกับข้อความสุดท้าย
-            setTimeout(() => {
-                btn.style.opacity = 1;
-                btn.style.pointerEvents = 'auto';
-            }, delay - 3500);
-        }
-
-        // --- ตั้งค่าหน้า Daily Prompt ---
-        function setupDailyPrompt() {
-            // จัดการวันที่ภาษาไทย
-            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            color: #555

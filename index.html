@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Focus & Flow: A Journey to Your Life's Vision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pridi:wght@300;400&family=Sarabun:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f9f9f6;
+            --text-color: #4a4a4a;
+            --accent-color: #8c8c73;
+            --font-heading: 'Pridi', serif;
+            --font-body: 'Sarabun', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #e0e0e0; /* สีพื้นหลังเมื่อเปิดบนจอใหญ่ */
+            color: var(--text-color);
+            font-family: var(--font-body);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #app-container {
+            background-color: var(--bg-color);
+            width: 100%;
+            max-width: 480px; /* จำลองขนาดหน้าจอสมาร์ทโฟน */
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+            background-color: var(--bg-color);
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* --- Screen 1: Onboarding --- */
+        #screen-onboarding {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .onboarding-text {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            line-height: 1.8;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            position: absolute;
+            width: 80%;
+        }
+        
+        .onboarding-text.show {
+            opacity: 1;
+        }
+
+        .breathing-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(140, 140, 115, 0.2);
+            position: absolute;
+            top: 30%;
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(3); opacity: 0.1; }
+        }
+
+        .btn-start {
+            margin-top: 60px;
+            padding: 12px 32px;
+            border: 1px solid var(--text-color);
+            background: transparent;
+            border-radius: 30px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1s ease, background 0.3s;
+            position: absolute;
+            bottom: 20%;
+        }
+
+        /* --- Screen 2: Daily Prompt --- */
+        #screen-prompt {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .top-nav {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .date-text {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+
+        .prompt-title {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        .prompt-desc {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 48px;
+            max-width: 85%;
+        }
+
+        .btn-camera {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--text-color);
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: background 0.3s;
+        }
+
+        .btn-camera:active {
+            background: #e0e0e0;
+        }
+
+        /* --- Screen 3: Zen Camera --- */
+        #screen-camera {
+            padding: 0;
+            background-color: #1a1a1a; /* พื้นหลังสีเข้มเวลาถ่ายรูป */
+        }
+
+        .camera-nav {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            z-index: 20;
+        }
+
+        .camera-nav .btn-icon {
+            color: #fff;
+        }
+
+        #camera-view {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shutter-container {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-shutter {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+
+        .btn-shutter:active {
+            background: #fff;
+        }
+
+        /* --- Screen 4: Reflection --- */
+        #screen-reflection {
+            justify-content: flex-start;
+        }
+
+        .reflection-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        #captured-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .reflection-questions {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .reflection-input {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            resize: none;
+            background: transparent;
+            outline: none;
+        }
+
+        .reflection-input:focus {
+            border-color: var(--text-color);
+        }
+
+        /* --- Screen 5: Inner Gallery --- */
+        #screen-gallery {
+            justify-content: flex-start;
+        }
+
+        .gallery-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .gallery-header h2 {
+            font-family: var(--font-heading);
+            font-weight: 400;
+            margin-left: 16px;
+        }
+
+        #gallery-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-bottom: 40px;
+        }
+
+        .gallery-item {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 24px;
+        }
+
+        .gallery-item-date {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .gallery-item-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .gallery-item-content {
+            display: flex;
+            gap: 16px;
+        }
+
+        .gallery-item-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .gallery-item-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #555;
+            white-space: pre-wrap;
+        }
+        
+        .empty-gallery {
+            text-align: center;
+            color: #999;
+            margin-top: 40px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <section id="screen-onboarding" class="screen active">
+            <div class="breathing-circle"></div>
+            <div class="onboarding-text" id="ob-1">ในโลกที่เร่งรีบ<br>เรามักมองทุกอย่างผ่าน “ความคิด”</div>
+            <div class="onboarding-text" id="ob-2">รีบตีความ รีบตัดสิน<br>จนลืมเห็นชีวิตอย่างที่มันเป็น</div>
+            <div class="onboarding-text" id="ob-3">ชวนคุณหยุด วางกรอบเดิมๆ<br>แล้วอนุญาตให้ตัวเองกลับมา 'เห็น' อีกครั้ง</div>
+            <div class="onboarding-text" id="ob-4">ไม่ต้องหาความสวยงาม<br>ไม่ต้องจัดฉาก... แค่สังเกตและรับรู้</div>
+            <button class="btn-start" id="btn-start" onclick="navigateTo('screen-prompt')">เริ่มต้นการเดินทาง</button>
+        </section>
+
+        <section id="screen-prompt" class="screen">
+            <div class="top-nav">
+                <button class="btn-icon" onclick="openGallery()">☰</button>
+            </div>
+            <div class="date-text" id="current-date">วันที่...</div>
+            <h1 class="prompt-title" id="prompt-title">...</h1>
+            <p class="prompt-desc" id="prompt-desc">...</p>
+            <button class="btn-camera" onclick="startCamera()">👁</button>
+        </section>
+
+        <section id="screen-camera" class="screen">
+            <div class="camera-nav">
+                <button class="btn-icon" onclick="stopCameraAndNavigate('screen-prompt')">✕</button>
+            </div>
+            <video id="camera-view" autoplay playsinline></video>
+            <canvas id="camera-canvas" style="display:none;"></canvas>
+            <div class="shutter-container">
+                <button class="btn-shutter" onclick="takePicture()"></button>
+            </div>
+        </section>
+
+        <section id="screen-reflection" class="screen">
+            <div class="reflection-nav">
+                <button class="btn-text" onclick="navigateTo('screen-prompt')">ยกเลิก</button>
+                <button class="btn-text" style="font-weight: bold;" onclick="saveReflection()">บันทึก</button>
+            </div>
+            <img id="captured-image" src="" alt="Captured moment">
+            <div class="reflection-questions">
+                ตอนที่มองสิ่งนี้ผ่านหน้าจอ คุณรู้สึกอย่างไร?<br>
+                ภาพนี้สะท้อนอะไรเกี่ยวกับชีวิตของคุณในตอนนี้บ้าง?
+            </div>
+            <textarea id="reflection-input" class="reflection-input" placeholder="พิมพ์สิ่งที่อยู่ในใจ... ไม่ต้องคัดกรอง"></textarea>
+        </section>
+
+        <section id="screen-gallery" class="screen">
+            <div class="gallery-header">
+                <button class="btn-icon" onclick="navigateTo('screen-prompt')">←</button>
+                <h2>การเดินทางของคุณ</h2>
+            </div>
+            <div id="gallery-list">
+                </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- ข้อมูลโจทย์ภาวนาประจำวัน ---
+        const prompts = [
+            { title: "ความธรรมดาที่ถูกมองข้าม", desc: "ถ่ายภาพสิ่งของใกล้ตัวที่คุณใช้งานทุกวัน แต่แทบไม่เคยหยุดมองรายละเอียดของมันเลย" },
+            { title: "เต้นรำกับแสงและเงา", desc: "ค้นหาบริเวณที่มีแสงและเงาพาดผ่าน สังเกตการตัดกันของความสว่างและความมืด แล้วบันทึกภาพนั้นไว้" },
+            { title: "พื้นที่ของความเงียบ", desc: "หาก 'ความเงียบ' ในพื้นที่ที่คุณอยู่ตอนนี้มีรูปร่างหน้าตา คุณคิดว่ามันคือมุมไหน?" },
+            { title: "ร่องรอยของกาลเวลา", desc: "ถ่ายภาพสิ่งที่กำลังร่วงโรย เก่าลง หรือเปลี่ยนสภาพไปตามเวลา โดยไม่ต้องตัดสินความงามของมัน" },
+            { title: "สิ่งที่กำลังเคลื่อนไหว", desc: "ถ่ายภาพสิ่งที่กำลังเปลี่ยนรูปทรงหรือตำแหน่ง โดยไม่ต้องกังวลว่าภาพจะเบลอ" },
+            { title: "สิ่งที่รั้งสายตา", desc: "ลองกวาดสายตาไปรอบๆ สิ่งแรกที่ดึงดูดสายตาคุณโดยไม่มีเหตุผลคืออะไร? ถ่ายเก็บไว้โดยไม่ต้องตั้งคำถามว่าทำไม" },
+            { title: "อุปสรรคและทางออก", desc: "ถ่ายภาพสิ่งที่ดูเหมือนการถูกปิดกั้น และภาพของช่องว่างที่แสงหรืออากาศลอดผ่านได้" }
+        ];
+
+        let currentPrompt = {};
+        let currentImageBase64 = "";
+        let cameraStream = null;
+
+        // --- ระบบนำทางหน้าจอ (Navigation) ---
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            
+            // หากกลับมาหน้าโจทย์ ให้ล้างข้อมูล Reflection เก่า
+            if(screenId === 'screen-prompt') {
+                document.getElementById('reflection-input').value = "";
+            }
+        }
+
+        // --- Onboarding Animation Sequence ---
+        function runOnboarding() {
+            // เช็คว่าเคยเข้าแอปหรือยัง (สำหรับ Demo นี้ตั้งให้เล่นตลอดเพื่อความสวยงาม แต่กดข้ามได้โดยรีบกดปุ่มเริ่ม)
+            const texts = [
+                document.getElementById('ob-1'),
+                document.getElementById('ob-2'),
+                document.getElementById('ob-3'),
+                document.getElementById('ob-4')
+            ];
+            const btn = document.getElementById('btn-start');
+            
+            let delay = 1000;
+            texts.forEach((text, index) => {
+                setTimeout(() => {
+                    // ซ่อนข้อความก่อนหน้า
+                    if (index > 0) texts[index-1].classList.remove('show');
+                    // แสดงข้อความปัจจุบัน
+                    text.classList.add('show');
+                }, delay);
+                delay += 3500; // จังหวะการอ่านแต่ละหน้า
+            });
+
+            // แสดงปุ่มเริ่มพร้อมกับข้อความสุดท้าย
+            setTimeout(() => {
+                btn.style.opacity = 1;
+                btn.style.pointerEvents = 'auto';
+            }, delay - 3500);
+        }
+
+        // --- ตั้งค่าหน้า Daily Prompt ---
+        function setupDailyPrompt() {
+            // จัดการวันที่ภาษาไทย
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('th-TH', dateOptions);
+            document.getElementById('current-date').innerText = "วันนี้ " + today;
+
+            // สุ่มโจทย์ (ใช้สูตรอิงตามวันที่ เพื่อให้โจทย์เดิมทั้งวัน)
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            currentPrompt = prompts[dayOfYear % prompts.length];
+            
+            document.getElementById('prompt-title').innerText = currentPrompt.title;
+            document.getElementById('prompt-desc').innerText = currentPrompt.desc;
+        }
+
+        // --- ระบบกล้อง (WebRTC) ---
+        async function startCamera() {
+            navigateTo('screen-camera');
+            const video = document.getElementById('camera-view');
+            try {
+                // บังคับใช้กล้องหลัง (environment)
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" }, 
+                    audio: false 
+                });
+                video.srcObject = cameraStream;
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("ไม่สามารถเข้าถึงกล้องได้ กรุณาตรวจสอบการอนุญาตการใช้กล้องในเบราว์เซอร์ของคุณ");
+                navigateTo('screen-prompt');
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+        }
+
+        function stopCameraAndNavigate(screenId) {
+            stopCamera();
+            navigateTo(screenId);
+        }
+
+        function takePicture() {
+            const video = document.getElementById('camera-view');
+            const canvas = document.getElementById('camera-canvas');
+            const context = canvas.getContext('2d');
+
+            // ตั้งค่าขนาด Canvas ให้ตรงกับวิดีโอเพื่อป้องกันภาพเบี้ยว
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // วาดภาพจาก Video ลง Canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // แปลงเป็น Base64 (ปรับคุณภาพเหลือ 0.6 เพื่อประหยัดพื้นที่ Local Storage)
+            currentImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+            // แสดงภาพที่ถ่ายในหน้า Reflection
+            document.getElementById('captured-image').src = currentImageBase64;
+            
+            stopCameraAndNavigate('screen-reflection');
+        }
+
+        // --- ระบบบันทึกและแกลเลอรี (Local Storage) ---
+        function saveReflection() {
+            const reflectionText = document.getElementById('reflection-input').value;
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            const newEntry = {
+                date: dateStr,
+                promptTitle: currentPrompt.title,
+                image: currentImageBase64,
+                text: reflectionText || "..." // ถ้าไม่ได้พิมพ์อะไรให้เป็นจุด
+            };
+
+            // ดึงข้อมูลเก่า และเพิ่มข้อมูลใหม่ไว้บนสุด
+            let entries = JSON.parse(localStorage.getItem('focusFlowEntries')) || [];
+            entries.unshift(newEntry);
+
+            try {
+                localStorage.setItem('focusFlowEntries', JSON.stringify(entries));
+                navigateTo('screen-prompt'); // กลับหน้าหลัก
+            } catch (e) {
+                // จัดการกรณี Local Storage เต็ม (โควต้าประมาณ 5MB)
+                alert("หน่วยความจำเต็ม กรุณาล้างข้อมูลหรือติดต่อผู้พัฒนาเพื่ออัปเกรดระบบฐานข้อมูล");
+            }
+        }
+
+        function openGallery() {
+            const listContainer = document.getElementById('gallery-list');
+            listContainer.innerHTML = ''; // ล้างของเก่าก่อนเรนเดอร์ใหม่
+            
+            const entries = JSON.parse(localStorage.getItem('focusFlowEntries')) || [];
+
+            if (entries.length === 0) {
+                listContainer.innerHTML = '<div class="empty-gallery">ยังไม่มีการบันทึกการเดินทาง<br>เริ่มถ่ายภาพภาวนาภาพแรกของคุณวันนี้</div>';
+            } else {
+                entries.forEach(entry => {
+                    const itemHTML = `
+                        <div class="gallery-item">
+                            <div class="gallery-item-date">${entry.date}</div>
+                            <div class="gallery-item-title">${entry.promptTitle}</div>
+                            <div class="gallery-item-content">
+                                <img class="gallery-item-img" src="${entry.image}" alt="Moment">
+                                <div class="gallery-item-text">${entry.text}</div>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.insertAdjacentHTML('beforeend', itemHTML);
+                });
+            }
+            
+            navigateTo('screen-gallery');
+        }
+
+        // --- เริ่มต้นการทำงานเมื่อโหลดหน้าจอ ---
+        window.onload = () => {
+            setupDailyPrompt();
+            runOnboarding();
+        };
+
+    </script>
+</body>
+</html>

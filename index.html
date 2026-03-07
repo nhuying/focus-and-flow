@@ -71,16 +71,40 @@
             align-items: center;
             text-align: center;
         }
-        
-        /* สัญลักษณ์ Focus & Flow */
-        .focus-flow-icon {
+
+        /* กลุ่มกราฟิก Focus, Flow และลมหายใจตรงกึ่งกลาง */
+        .graphic-container {
             position: absolute;
-            top: 15%;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .breathing-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(140, 140, 115, 0.2);
+            position: absolute;
+            animation: breathe 4s infinite ease-in-out;
+            z-index: 1; /* ให้อยู่ด้านหลังเส้น SVG */
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(3.5); opacity: 0.1; } /* ขยายออกอย่างนุ่มนวล */
+        }
+
+        .focus-flow-icon {
+            position: absolute;
+            z-index: 2; /* ให้อยู่ด้านหน้าลมหายใจ */
             opacity: 0;
-            animation: fadeInIcon 2s forwards 0.5s; /* ค่อยๆ ปรากฏขึ้นมา */
+            animation: fadeInIcon 2s forwards 0.5s;
         }
 
         @keyframes fadeInIcon {
@@ -88,10 +112,11 @@
         }
 
         .focus-flow-icon svg {
-            width: 70px;
-            height: 70px;
+            width: 160px; /* ความกว้างเพิ่มขึ้นสองเท่า */
+            height: 80px;
+            display: block;
         }
-
+        
         .onboarding-text {
             font-family: var(--font-heading);
             font-size: 1.2rem;
@@ -100,26 +125,12 @@
             transition: opacity 1.5s ease-in-out;
             position: absolute;
             width: 80%;
-            margin-top: 20px; /* ขยับลงมาไม่ให้ทับสัญลักษณ์ */
+            top: 55%; /* ขยับข้อความลงมาให้สมดุลกับกราฟิกด้านบน */
+            transform: translateY(-50%);
         }
         
         .onboarding-text.show {
             opacity: 1;
-        }
-
-        .breathing-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: rgba(140, 140, 115, 0.2);
-            position: absolute;
-            top: 35%; /* ขยับลงมาเล็กน้อยให้สมดุลกับกราฟิกด้านบน */
-            animation: breathe 4s infinite ease-in-out;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(3); opacity: 0.1; }
         }
 
         .btn-start {
@@ -164,7 +175,6 @@
             padding: 8px;
         }
 
-        /* ปุ่มสุ่มโจทย์ใหม่ให้เล็กลงเล็กน้อยเพื่อความมินิมอล */
         .btn-refresh {
             font-size: 1.2rem; 
         }
@@ -384,15 +394,17 @@
         
         <section id="screen-onboarding" class="screen active">
             
-            <div class="focus-flow-icon">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 10 50 Q 30 25 50 50 T 90 50" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M 10 65 Q 30 40 50 65 T 90 65" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-                    <circle cx="50" cy="50" r="7" fill="#4a4a4a"/>
-                </svg>
+            <div class="graphic-container">
+                <div class="breathing-circle"></div>
+                <div class="focus-flow-icon">
+                    <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 10 50 Q 55 20 100 50 T 190 50" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M 10 65 Q 55 35 100 65 T 190 65" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+                        <circle cx="100" cy="50" r="4" fill="#4a4a4a"/>
+                    </svg>
+                </div>
             </div>
 
-            <div class="breathing-circle"></div>
             <div class="onboarding-text" id="ob-1">ในโลกที่เร่งรีบ<br>เรามักมองทุกอย่างผ่าน “ความคิด”</div>
             <div class="onboarding-text" id="ob-2">รีบตีความ รีบตัดสิน<br>จนลืมเห็นชีวิตอย่างที่มันเป็น</div>
             <div class="onboarding-text" id="ob-3">ชวนคุณหยุด วางกรอบเดิมๆ<br>แล้วอนุญาตให้ตัวเองกลับมา 'เห็น' อีกครั้ง</div>
@@ -447,7 +459,7 @@
     </div>
 
     <script>
-        // --- ข้อมูลโจทย์ภาวนาประจำวัน (รวมจากภาพ "วิธีหาความหมายของชีวิต") ---
+        // --- ข้อมูลโจทย์ภาวนาประจำวัน ---
         const prompts = [
             { title: "ความธรรมดาที่ถูกมองข้าม", desc: "ถ่ายภาพสิ่งของใกล้ตัวที่คุณใช้งานทุกวัน แต่แทบไม่เคยหยุดมองรายละเอียดของมันเลย" },
             { title: "เต้นรำกับแสงและเงา", desc: "ค้นหาบริเวณที่มีแสงและเงาพาดผ่าน สังเกตการตัดกันของความสว่างและความมืด แล้วบันทึกภาพนั้นไว้" },
@@ -457,7 +469,7 @@
             { title: "สิ่งที่รั้งสายตา", desc: "ลองกวาดสายตาไปรอบๆ สิ่งแรกที่ดึงดูดสายตาคุณโดยไม่มีเหตุผลคืออะไร? ถ่ายเก็บไว้โดยไม่ต้องตั้งคำถามว่าทำไม" },
             { title: "อุปสรรคและทางออก", desc: "ถ่ายภาพสิ่งที่ดูเหมือนการถูกปิดกั้น และภาพของช่องว่างที่แสงหรืออากาศลอดผ่านได้" },
             
-            // --- เนื้อหาจากภาพใหม่ ---
+            // --- เนื้อหาจากภาพ ---
             { title: "ย้อนมองวันที่โลกยังไม่กำหนดบทบาท", desc: "ลองกลับไปคุยกับตัวเองในวัยเด็ก ช่วงเวลาก่อนจะมีคำว่า 'เก่ง' หรือ 'ไม่เก่ง' เข้ามาตัดสิน ถ่ายภาพบางสิ่งที่ชวนให้คุณนึกถึงความรู้สึกในวันนั้น" },
             { title: "สังเกตช่วงเวลาที่ 'เวลาหายไป'", desc: "ลองมองหา 'ภาวะลื่นไหล' ในชีวิตประจำวัน กิจกรรมที่ดึงเราเข้าไปจนลืมดูนาฬิกา ถ่ายภาพร่องรอยของกิจกรรมนั้นเอาไว้" },
             { title: "ฟังความรู้สึกอย่างอ่อนโยน", desc: "อย่าเพิ่งรีบผลักไสความรู้สึกด้านลบ มันอาจซ่อน 'ความปรารถนา' บางอย่าง ถ่ายภาพสิ่งที่สะท้อนถึงชีวิตแบบที่หัวใจคุณอยากลองสัมผัส" },
@@ -479,8 +491,6 @@
             });
             document.getElementById(screenId).classList.add('active');
             
-            // หากกลับมาหน้าโจทย์ ให้ล้างข้อมูล Reflection เก่า
-            // หมายเหตุ: ตัดการสุ่มโจทย์ใหม่อัตโนมัติในส่วนนี้ออก เพื่อให้ผู้ใช้กดปุ่ม '↻' เองหากต้องการเปลี่ยนโจทย์
             if(screenId === 'screen-prompt') {
                 document.getElementById('reflection-input').value = "";
             }
@@ -511,13 +521,12 @@
             }, delay - 3500);
         }
 
-        // --- ตั้งค่าหน้า Prompt (แก้ไขให้สุ่มใหม่ทุกครั้งที่เรียกใช้) ---
+        // --- ตั้งค่าหน้า Prompt ---
         function setupDailyPrompt() {
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const today = new Date().toLocaleDateString('th-TH', dateOptions);
             document.getElementById('current-date').innerText = "วันนี้ " + today;
 
-            // สุ่มโจทย์ใหม่ทั้งหมดด้วย Math.random()
             const randomIndex = Math.floor(Math.random() * prompts.length);
             currentPrompt = prompts[randomIndex];
             

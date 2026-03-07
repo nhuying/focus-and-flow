@@ -72,6 +72,26 @@
             text-align: center;
         }
         
+        /* สัญลักษณ์ Focus & Flow */
+        .focus-flow-icon {
+            position: absolute;
+            top: 15%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeInIcon 2s forwards 0.5s; /* ค่อยๆ ปรากฏขึ้นมา */
+        }
+
+        @keyframes fadeInIcon {
+            to { opacity: 1; }
+        }
+
+        .focus-flow-icon svg {
+            width: 70px;
+            height: 70px;
+        }
+
         .onboarding-text {
             font-family: var(--font-heading);
             font-size: 1.2rem;
@@ -80,6 +100,7 @@
             transition: opacity 1.5s ease-in-out;
             position: absolute;
             width: 80%;
+            margin-top: 20px; /* ขยับลงมาไม่ให้ทับสัญลักษณ์ */
         }
         
         .onboarding-text.show {
@@ -92,7 +113,7 @@
             border-radius: 50%;
             background-color: rgba(140, 140, 115, 0.2);
             position: absolute;
-            top: 30%;
+            top: 35%; /* ขยับลงมาเล็กน้อยให้สมดุลกับกราฟิกด้านบน */
             animation: breathe 4s infinite ease-in-out;
         }
 
@@ -141,6 +162,11 @@
             color: var(--text-color);
             cursor: pointer;
             padding: 8px;
+        }
+
+        /* ปุ่มสุ่มโจทย์ใหม่ให้เล็กลงเล็กน้อยเพื่อความมินิมอล */
+        .btn-refresh {
+            font-size: 1.2rem; 
         }
 
         .date-text {
@@ -357,6 +383,15 @@
     <div id="app-container">
         
         <section id="screen-onboarding" class="screen active">
+            
+            <div class="focus-flow-icon">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 10 50 Q 30 25 50 50 T 90 50" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M 10 65 Q 30 40 50 65 T 90 65" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="7" fill="#4a4a4a"/>
+                </svg>
+            </div>
+
             <div class="breathing-circle"></div>
             <div class="onboarding-text" id="ob-1">ในโลกที่เร่งรีบ<br>เรามักมองทุกอย่างผ่าน “ความคิด”</div>
             <div class="onboarding-text" id="ob-2">รีบตีความ รีบตัดสิน<br>จนลืมเห็นชีวิตอย่างที่มันเป็น</div>
@@ -368,6 +403,7 @@
         <section id="screen-prompt" class="screen">
             <div class="top-nav">
                 <button class="btn-icon" onclick="openGallery()">☰</button>
+                <button class="btn-icon btn-refresh" onclick="setupDailyPrompt()" title="สุ่มโจทย์ใหม่">↻</button>
             </div>
             <div class="date-text" id="current-date">วันที่...</div>
             <h1 class="prompt-title" id="prompt-title">...</h1>
@@ -421,7 +457,7 @@
             { title: "สิ่งที่รั้งสายตา", desc: "ลองกวาดสายตาไปรอบๆ สิ่งแรกที่ดึงดูดสายตาคุณโดยไม่มีเหตุผลคืออะไร? ถ่ายเก็บไว้โดยไม่ต้องตั้งคำถามว่าทำไม" },
             { title: "อุปสรรคและทางออก", desc: "ถ่ายภาพสิ่งที่ดูเหมือนการถูกปิดกั้น และภาพของช่องว่างที่แสงหรืออากาศลอดผ่านได้" },
             
-            // --- เพิ่มเนื้อหาจากภาพใหม่ ---
+            // --- เนื้อหาจากภาพใหม่ ---
             { title: "ย้อนมองวันที่โลกยังไม่กำหนดบทบาท", desc: "ลองกลับไปคุยกับตัวเองในวัยเด็ก ช่วงเวลาก่อนจะมีคำว่า 'เก่ง' หรือ 'ไม่เก่ง' เข้ามาตัดสิน ถ่ายภาพบางสิ่งที่ชวนให้คุณนึกถึงความรู้สึกในวันนั้น" },
             { title: "สังเกตช่วงเวลาที่ 'เวลาหายไป'", desc: "ลองมองหา 'ภาวะลื่นไหล' ในชีวิตประจำวัน กิจกรรมที่ดึงเราเข้าไปจนลืมดูนาฬิกา ถ่ายภาพร่องรอยของกิจกรรมนั้นเอาไว้" },
             { title: "ฟังความรู้สึกอย่างอ่อนโยน", desc: "อย่าเพิ่งรีบผลักไสความรู้สึกด้านลบ มันอาจซ่อน 'ความปรารถนา' บางอย่าง ถ่ายภาพสิ่งที่สะท้อนถึงชีวิตแบบที่หัวใจคุณอยากลองสัมผัส" },
@@ -443,9 +479,9 @@
             });
             document.getElementById(screenId).classList.add('active');
             
-            // หากกลับมาหน้าโจทย์ ให้สุ่มโจทย์ใหม่เสมอ และล้างข้อมูล Reflection เก่า
+            // หากกลับมาหน้าโจทย์ ให้ล้างข้อมูล Reflection เก่า
+            // หมายเหตุ: ตัดการสุ่มโจทย์ใหม่อัตโนมัติในส่วนนี้ออก เพื่อให้ผู้ใช้กดปุ่ม '↻' เองหากต้องการเปลี่ยนโจทย์
             if(screenId === 'screen-prompt') {
-                setupDailyPrompt(); // เรียกใช้ฟังก์ชันสุ่มโจทย์ใหม่
                 document.getElementById('reflection-input').value = "";
             }
         }
@@ -475,7 +511,7 @@
             }, delay - 3500);
         }
 
-        // --- ตั้งค่าหน้า Prompt (แก้ไขให้สุ่มใหม่ทุกครั้ง) ---
+        // --- ตั้งค่าหน้า Prompt (แก้ไขให้สุ่มใหม่ทุกครั้งที่เรียกใช้) ---
         function setupDailyPrompt() {
             const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
             const today = new Date().toLocaleDateString('th-TH', dateOptions);

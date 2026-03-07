@@ -92,17 +92,17 @@
             background-color: rgba(140, 140, 115, 0.2);
             position: absolute;
             animation: breathe 4s infinite ease-in-out;
-            z-index: 1; /* ให้อยู่ด้านหลังเส้น SVG */
+            z-index: 1;
         }
 
         @keyframes breathe {
             0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(3.5); opacity: 0.1; } /* ขยายออกอย่างนุ่มนวล */
+            50% { transform: scale(3.5); opacity: 0.1; }
         }
 
         .focus-flow-icon {
             position: absolute;
-            z-index: 2; /* ให้อยู่ด้านหน้าลมหายใจ */
+            z-index: 2;
             opacity: 0;
             animation: fadeInIcon 2s forwards 0.5s;
         }
@@ -112,20 +112,25 @@
         }
 
         .focus-flow-icon svg {
-            width: 160px; /* ความกว้างเพิ่มขึ้นสองเท่า */
+            width: 160px;
             height: 80px;
             display: block;
         }
 
-        /* แอนิเมชันวาดเส้นคลื่นจากซ้ายไปขวา */
+        /* แก้ไขแอนิเมชันวาดเส้นคลื่นให้รองรับ Safari บน iOS */
         .animated-flow-line {
-            stroke-dasharray: 2000; /* กำหนดความยาวของเส้นประให้ยาวกว่าเส้นจริงมาก */
-            stroke-dashoffset: 2000; /* เริ่มต้นโดยการซ่อนเส้น */
-            animation: drawFlowLine 3s linear forwards; /* วาดเส้นใน 3 วินาที */
+            stroke-dasharray: 250; /* ลดตัวเลขลงให้ใกล้เคียงความยาวจริง เพื่อให้ Safari ประมวลผลได้ */
+            stroke-dashoffset: 250;
+            -webkit-animation: drawFlowLine 3s ease-in-out 1s forwards; /* เพิ่ม -webkit- และ Delay 1s */
+            animation: drawFlowLine 3s ease-in-out 1s forwards;
+        }
+
+        @-webkit-keyframes drawFlowLine {
+            to { stroke-dashoffset: 0; }
         }
 
         @keyframes drawFlowLine {
-            to { stroke-dashoffset: 0; } /* ค่อยๆ ลด Dashoffset ลงจนเส้นปรากฏ */
+            to { stroke-dashoffset: 0; }
         }
         
         .onboarding-text {
@@ -136,7 +141,7 @@
             transition: opacity 1.5s ease-in-out;
             position: absolute;
             width: 80%;
-            top: 55%; /* ขยับข้อความลงมาให้สมดุลกับกราฟิกด้านบน */
+            top: 55%;
             transform: translateY(-50%);
         }
         

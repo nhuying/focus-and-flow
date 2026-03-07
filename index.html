@@ -116,6 +116,17 @@
             height: 80px;
             display: block;
         }
+
+        /* แอนิเมชันวาดเส้นคลื่นจากซ้ายไปขวา */
+        .animated-flow-line {
+            stroke-dasharray: 2000; /* กำหนดความยาวของเส้นประให้ยาวกว่าเส้นจริงมาก */
+            stroke-dashoffset: 2000; /* เริ่มต้นโดยการซ่อนเส้น */
+            animation: drawFlowLine 3s linear forwards; /* วาดเส้นใน 3 วินาที */
+        }
+
+        @keyframes drawFlowLine {
+            to { stroke-dashoffset: 0; } /* ค่อยๆ ลด Dashoffset ลงจนเส้นปรากฏ */
+        }
         
         .onboarding-text {
             font-family: var(--font-heading);
@@ -398,8 +409,7 @@
                 <div class="breathing-circle"></div>
                 <div class="focus-flow-icon">
                     <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 10 50 Q 55 20 100 50 T 190 50" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M 10 65 Q 55 35 100 65 T 190 65" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+                        <path class="animated-flow-line" d="M 10 50 Q 55 20 100 50 T 190 50" fill="none" stroke="#8c8c73" stroke-width="3" stroke-linecap="round"/>
                         <circle cx="100" cy="50" r="4" fill="#4a4a4a"/>
                     </svg>
                 </div>
